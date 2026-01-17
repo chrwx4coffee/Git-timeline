@@ -1,0 +1,97 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: git_timeline_db
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${DB_NAME}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  auth-service:
+    build: ./services/auth-service
+    container_name: auth-service
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      node_env: development
+      PORT: 3001
+      DB_HOST: git_timeline_db
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      JWT_SECRET: ${JWT_SECRET}
+    ports:
+      - "3001:3001"
+    networks:
+      - app-network
+
+  github-fetch-service:
+    build: ./services/github-fetch-service
+    container_name: github-fetch-service
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      node_env: development
+      PORT: 3002
+      DB_HOST: git_timeline_db
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+      GITHUB_TOKEN: ${GITHUB_TOKEN}
+    ports:
+      - "3002:3002"
+    networks:
+      - app-network
+
+  timeline-processor-service:
+    build: ./services/timeline-processor-service
+    container_name: timeline-processor-service
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      node_env: development
+      PORT: 3003
+      DB_HOST: postgres
+      DB_USER: ${DB_USER}
+      DB_PASSWORD: ${DB_PASSWORD}
+      DB_NAME: ${DB_NAME}
+    ports:
+      - "3003:3003"
+    networks:
+      - app-network
+
+  frontend:
+    build: ./services/frontend
+    container_name: frontend
+    depends_on:
+      - auth-service
+      - github-fetch-service
+      - timeline-processor-service
+    ports:
+      - "3000:3000"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres_data:
