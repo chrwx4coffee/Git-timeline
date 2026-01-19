@@ -13,3 +13,29 @@ body {
     font-family: 'Inter', sans-serif;
     -webkit-font-smoothing: antialiased;
 }
+
+
+@keyframes gradient {
+
+    0%,
+    100% {
+        background-position: 0% 50%;
+    }
+
+    50% {
+        background-position: 100% 50%;
+    }
+}
+
+.animate-gradient {
+    background-size: 200% 200%;
+    animation: gradient 3s ease infinite;
+}
+
+.glass-border {
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.bg-glass-border {
+    background: rgba(255, 255, 255, 0.05);
+}

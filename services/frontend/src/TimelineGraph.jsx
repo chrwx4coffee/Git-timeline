@@ -493,24 +493,7 @@ const TimelineGraph = ({ data, repoInfo }) => {
                 </div>
             </div>
 
-            {/* Sidebar Stats */}
-            <div className={`absolute top-20 left-4 z-10 w-60 p-4 rounded-2xl backdrop-blur-xl border transition-all ${isDarkMode ? 'bg-slate-900/80 border-white/10' : 'bg-white/80 border-slate-200 shadow-xl'}`}>
-                <div className="flex items-center gap-2 mb-4">
-                    <TrendingUp size={16} className="text-cyan-400" />
-                    <h3 className="font-bold text-xs uppercase tracking-wider text-slate-500">Statistics</h3>
-                </div>
-                {stats && (
-                    <div className="space-y-3">
-                        <StatItem icon={<GitCommit size={14} />} label="Total Commits" value={stats.totalCommits} color="cyan" isDarkMode={isDarkMode} />
-                        <StatItem icon={<GitBranch size={14} />} label="Branches" value={stats.branches} color="purple" isDarkMode={isDarkMode} />
-                        <StatItem icon={<User size={14} />} label="Contributors" value={stats.authors} color="green" isDarkMode={isDarkMode} />
-                        {stats.mostActiveAuthor.author && (
-                            <StatItem icon={<Crown size={14} />} label="Most Active" value={`${stats.mostActiveAuthor.author} (${stats.mostActiveAuthor.count})`} color="yellow" isDarkMode={isDarkMode} />
-                        )}
-                        <StatItem icon={<Calendar size={14} />} label="Duration" value={`${Math.ceil((stats.lastCommit - stats.firstCommit) / (86400000))} days`} color="pink" isDarkMode={isDarkMode} />
-                    </div>
-                )}
-            </div>
+
 
             {/* View Mode Toggle */}
             <div className={`absolute bottom-6 left-1/2 -translate-x-1/2 z-20 backdrop-blur-md p-1 rounded-full flex gap-1 border ${isDarkMode ? 'bg-black/50 border-white/10' : 'bg-white/80 border-slate-200 shadow-lg'}`}>
