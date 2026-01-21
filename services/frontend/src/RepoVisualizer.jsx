@@ -106,7 +106,7 @@ const InfoRow = ({ label, value }) => (
     </div>
 );
 
-const Dashboard = () => {
+const RepoVisualizer = () => {
     // Core State
     const [repoUrl, setRepoUrl] = useState('');
     const [loading, setLoading] = useState(false);
@@ -272,7 +272,10 @@ const Dashboard = () => {
 
         try {
             // 1. Analyze Repo
-            const analyzeRes = await axios.post('http://localhost:3002/analyze-repo', { repoUrl });
+            const token = localStorage.getItem('token');
+            const analyzeRes = await axios.post('http://localhost:3002/analyze-repo', { repoUrl }, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
             const { repoId } = analyzeRes.data;
             setRepoInfo({ id: repoId, url: repoUrl });
 
@@ -858,4 +861,4 @@ const Dashboard = () => {
     );
 };
 
-export default Dashboard;
+export default RepoVisualizer;

@@ -54,6 +54,7 @@ services:
       DB_PASSWORD: ${DB_PASSWORD}
       DB_NAME: ${DB_NAME}
       GITHUB_TOKEN: ${GITHUB_TOKEN}
+      JWT_SECRET: ${JWT_SECRET}
     ports:
       - "3002:3002"
     networks:

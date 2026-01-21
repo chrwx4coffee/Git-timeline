@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import LandingPage from './LandingPage';
-import Dashboard from './Dashboard';
+import RepoVisualizer from './RepoVisualizer';
+import UserDashboard from './UserDashboard';
 import Header from './Header';
 
 const App = () => {
@@ -41,7 +42,11 @@ const App = () => {
                 )}
 
                 {view === 'dashboard' && (
-                    <Dashboard />
+                    <UserDashboard />
+                )}
+
+                {view === 'visualizer' && (
+                    <RepoVisualizer />
                 )}
             </main>
         </div>

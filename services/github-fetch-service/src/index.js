@@ -3,6 +3,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import pg from 'pg';
 import { Octokit } from 'octokit';
+import jwt from 'jsonwebtoken';
 
 dotenv.config();
 
@@ -28,13 +29,27 @@ const octokit = new Octokit({
     auth: process.env.GITHUB_TOKEN
 });
 
+// Verify Token Middleware
+const verifyToken = (req, res, next) => {
+    const token = req.headers['authorization'];
+    if (!token) return res.status(403).json({ error: 'No token provided' });
+
+    try {
+        const decoded = jwt.verify(token.replace('Bearer ', ''), process.env.JWT_SECRET || 'secret');
+        req.user = decoded;
+        next();
+    } catch (err) {
+        return res.status(401).json({ error: 'Unauthorized' });
+    }
+};
+
 // Helper to update repository status (if we had a status field on the repo, but checking the prompt we have analyzed_at)
 const updateRepoStatus = async (id) => {
     await pool.query('UPDATE repositories SET analyzed_at = NOW() WHERE id = $1', [id]);
 };
 
 // Analyze Repo Endpoint
-app.post('/analyze-repo', async (req, res) => {
+app.post('/analyze-repo', verifyToken, async (req, res) => {
     const { repoUrl } = req.body;
 
     if (!repoUrl) {
@@ -163,6 +178,12 @@ app.post('/analyze-repo', async (req, res) => {
         // Let's trigger it via HTTP call or just let frontend do it.
         // User flow: "Frontend requests timeline". Probably triggers generation if needed?
         // Let's return success here.
+
+        // Log User Activity
+        await pool.query(
+            'INSERT INTO user_activity (user_id, repo_id, activity_type) VALUES ($1, $2, $3)',
+            [req.user.id, repoId, 'ANALYZE']
+        );
 
         res.json({ message: 'Repository analyzed successfully', repoId });
 

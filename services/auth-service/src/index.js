@@ -127,6 +127,54 @@ app.get('/me', verifyToken, async (req, res) => {
     }
 });
 
+// User History
+app.get('/user/history', verifyToken, async (req, res) => {
+    try {
+        const history = await pool.query(`
+            SELECT r.id, r.owner, r.name, r.url, ua.created_at as analyzed_at
+            FROM user_activity ua
+            JOIN repositories r ON ua.repo_id = r.id
+            WHERE ua.user_id = $1 AND ua.activity_type = 'ANALYZE'
+            ORDER BY ua.created_at DESC
+            LIMIT 50
+        `, [req.user.id]);
+        res.json(history.rows);
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+// User Stats
+app.get('/user/stats', verifyToken, async (req, res) => {
+    try {
+        // Total Analyzed Repos
+        const totalResult = await pool.query(
+            'SELECT COUNT(*) FROM user_activity WHERE user_id = $1 AND activity_type = \'ANALYZE\'',
+            [req.user.id]
+        );
+
+        // Daily Queries (Last 7 days)
+        const dailyResult = await pool.query(`
+            SELECT DATE(created_at) as date, COUNT(*) as count
+            FROM user_activity 
+            WHERE user_id = $1 AND activity_type = 'ANALYZE' 
+            AND created_at > NOW() - INTERVAL '7 days'
+            GROUP BY DATE(created_at)
+            ORDER BY DATE(created_at) ASC
+        `, [req.user.id]);
+
+        res.json({
+            totalAnalyzed: parseInt(totalResult.rows[0].count),
+            dailyActivity: dailyResult.rows
+        });
+    } catch (err) {
+        console.error(err);
+        res.status(500).json({ error: 'Server error' });
+    }
+});
+
+
 app.listen(PORT, () => {
     console.log(`Auth Service running on port ${PORT}`);
 });

@@ -44,3 +44,11 @@ CREATE TABLE IF NOT EXISTS timeline_events (
     payload JSONB,
     event_time TIMESTAMP WITH TIME ZONE
 );
+
+CREATE TABLE IF NOT EXISTS user_activity (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID REFERENCES users(id) ON DELETE CASCADE,
+    repo_id UUID REFERENCES repositories(id) ON DELETE CASCADE,
+    activity_type VARCHAR(50) NOT NULL, -- 'ANALYZE', etc.
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);

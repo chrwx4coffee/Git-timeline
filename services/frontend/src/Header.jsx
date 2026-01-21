@@ -18,7 +18,8 @@ const Header = ({ onViewChange, isLoggedIn, onLogout }) => {
             <nav className="flex gap-6 font-rajdhani font-bold text-lg">
                 {isLoggedIn ? (
                     <>
-                        <button onClick={() => onViewChange('dashboard')} className="text-slate-300 hover:text-neon-green transition-colors">DASHBOARD</button>
+                        <button onClick={() => onViewChange('dashboard')} className="text-slate-300 hover:text-neon-green transition-colors">ACCOUNT</button>
+                        <button onClick={() => onViewChange('visualizer')} className="text-slate-300 hover:text-neon-blue transition-colors">ANALYZE</button>
                         <button onClick={onLogout} className="text-slate-300 hover:text-red-500 transition-colors">LOGOUT</button>
                     </>
                 ) : (

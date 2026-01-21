@@ -178,128 +178,11 @@ const ParticleBackground = () => {
 };
 
 // Simulated Timeline Demo Component
-const DemoModal = ({ isOpen, onClose }) => {
-    if (!isOpen) return null;
 
-    const [files, setFiles] = useState([]);
-
-    useEffect(() => {
-        if (isOpen) {
-            const timer = setInterval(() => {
-                setFiles(prev => {
-                    const newFile = {
-                        id: Date.now(),
-                        x: Math.random() * 80 + 10,
-                        y: Math.random() * 80 + 10,
-                        name: ['main.js', 'styles.css', 'app.jsx', 'utils.js', 'config.json'][Math.floor(Math.random() * 5)],
-                        user: ['Emre', 'Alice', 'Bob', 'Charlie'][Math.floor(Math.random() * 4)]
-                    };
-                    return [...prev, newFile].slice(-15);
-                });
-            }, 800);
-            return () => clearInterval(timer);
-        }
-    }, [isOpen]);
-
-    return (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-md">
-            <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                className="bg-black/90 border border-glass-border/50 rounded-2xl w-full max-w-4xl h-[600px] overflow-hidden flex flex-col relative shadow-2xl"
-            >
-                {/* Header */}
-                <div className="p-4 border-b border-glass-border/30 flex items-center justify-between bg-white/5">
-                    <div className="flex items-center gap-3">
-                        <div className="w-3 h-3 rounded-full bg-red-500/80"></div>
-                        <div className="w-3 h-3 rounded-full bg-yellow-500/80"></div>
-                        <div className="w-3 h-3 rounded-full bg-green-500/80"></div>
-                        <span className="text-sm font-mono text-slate-400 ml-2">LIVE PREVIEW MODE -- SIMULATION</span>
-                    </div>
-                    <button
-                        onClick={onClose}
-                        className="p-2 hover:bg-white/10 rounded-lg transition-colors text-slate-400 hover:text-white"
-                    >
-                        ✕
-                    </button>
-                </div>
-
-                {/* Simulation Area */}
-                <div className="flex-1 relative overflow-hidden bg-gray-900/50">
-                    <div className="absolute inset-0 opacity-20 pointer-events-none bg-[size:40px_40px] bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)]"></div>
-
-                    <AnimatePresence>
-                        {files.map((file) => (
-                            <motion.div
-                                key={file.id}
-                                initial={{ opacity: 0, scale: 0 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                exit={{ opacity: 0, scale: 0 }}
-                                style={{ left: `${file.x}%`, top: `${file.y}%` }}
-                                className="absolute flex flex-col items-center gap-2"
-                            >
-                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-neon-blue to-neon-purple flex items-center justify-center text-[10px] font-bold shadow-[0_0_15px_rgba(0,243,255,0.3)]">
-                                    <GitBranch className="w-4 h-4 text-white" />
-                                </div>
-                                <div className="px-2 py-1 bg-black/60 rounded text-xs text-neon-blue border border-glass-border/30 backdrop-blur">
-                                    {file.user} pushed {file.name}
-                                </div>
-                            </motion.div>
-                        ))}
-                    </AnimatePresence>
-
-                    {/* Connecting Lines Effect (Decorative) */}
-                    <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-30">
-                        {files.map((file, i) => (
-                            i > 0 && (
-                                <line
-                                    key={i}
-                                    x1={`${files[i - 1].x}%`}
-                                    y1={`${files[i - 1].y}%`}
-                                    x2={`${file.x}%`}
-                                    y2={`${file.y}%`}
-                                    stroke="url(#lineGradient)"
-                                    strokeWidth="1"
-                                />
-                            )
-                        ))}
-                        <defs>
-                            <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                                <stop offset="0%" stopColor="#00f3ff" stopOpacity="0" />
-                                <stop offset="50%" stopColor="#00f3ff" stopOpacity="1" />
-                                <stop offset="100%" stopColor="#bc13fe" stopOpacity="0" />
-                            </linearGradient>
-                        </defs>
-                    </svg>
-                </div>
-
-                {/* Footer Controls */}
-                <div className="p-6 border-t border-glass-border/30 bg-black/80 flex items-center justify-between">
-                    <div className="flex gap-4">
-                        <div className="flex flex-col">
-                            <span className="text-xs text-slate-500">COMMITS ANALYZED</span>
-                            <span className="text-xl font-orbitron text-neon-blue">
-                                {2450 + files.length * 12}
-                            </span>
-                        </div>
-                        <div className="flex flex-col">
-                            <span className="text-xs text-slate-500">ACTIVE BRANCHES</span>
-                            <span className="text-xl font-orbitron text-neon-purple">12</span>
-                        </div>
-                    </div>
-                    <button className="px-6 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm font-semibold transition-colors">
-                        PAUSE SIMULATION
-                    </button>
-                </div>
-            </motion.div>
-        </div>
-    );
-};
 
 const EnhancedLandingPage = ({ onAuthSuccess }) => {
     const [isRegistering, setIsRegistering] = useState(false);
-    const [isDemoOpen, setIsDemoOpen] = useState(false);
+
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
@@ -487,14 +370,7 @@ const EnhancedLandingPage = ({ onAuthSuccess }) => {
                             </span>
                         </motion.button>
 
-                        <motion.button
-                            whileHover={{ scale: 1.05 }}
-                            whileTap={{ scale: 0.95 }}
-                            onClick={() => setIsDemoOpen(true)}
-                            className="px-12 py-4 border-2 border-glass-border rounded-xl font-orbitron hover:bg-white/5 transition-colors"
-                        >
-                            VIEW DEMO
-                        </motion.button>
+
                     </motion.div>
 
                     {/* Stats */}
@@ -553,22 +429,22 @@ const EnhancedLandingPage = ({ onAuthSuccess }) => {
 
                         <div className="space-y-8">
                             <EnhancedFeatureCard
-                                title="TIMELINE VISUALIZATION"
-                                desc="Interactive 3D timeline showing your repository's evolution with granular commit details."
+                                title="INTERACTIVE GRAPH"
+                                desc="Visualize commit history with a dynamic, chronological graph. Track branches, merges, and tags effortlessly."
                                 delay={0.1}
                                 icon={GitBranch}
                                 gradient="bg-gradient-to-br from-neon-blue/20 to-neon-purple/20"
                             />
                             <EnhancedFeatureCard
-                                title="AI ANALYSIS"
-                                desc="Machine learning algorithms detect patterns, anomalies, and optimization opportunities."
+                                title="AI-POWERED INSIGHTS"
+                                desc="Leverage local LLMs to analyze code changes, summarize commits, and answer queries about your repository."
                                 delay={0.2}
                                 icon={Cpu}
                                 gradient="bg-gradient-to-br from-purple-500/20 to-pink-500/20"
                             />
                             <EnhancedFeatureCard
-                                title="REAL-TIME SYNC"
-                                desc="Live updates from your repositories with instant visualization rendering."
+                                title="LIVE REPOSITORY SYNC"
+                                desc="Connect seamlessly to your local Git repositories for instant, real-time analysis and visualization."
                                 delay={0.3}
                                 icon={Zap}
                                 gradient="bg-gradient-to-br from-green-500/20 to-cyan-500/20"
@@ -820,7 +696,7 @@ const EnhancedLandingPage = ({ onAuthSuccess }) => {
                 <div className="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.03)_50%)] bg-[length:100%_4px]"></div>
             </div>
 
-            <DemoModal isOpen={isDemoOpen} onClose={() => setIsDemoOpen(false)} />
+
         </div>
     );
 };
